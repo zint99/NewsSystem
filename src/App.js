@@ -1,25 +1,15 @@
-import logo from './logo.svg';
-import './App.css';
+import { HashRouter } from 'react-router-dom'
+import './App.css'
+import BaseRouter from './router/BaseRouter'
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <HashRouter>
+      {/* 一级路由 */}
+      <BaseRouter>
+      </BaseRouter>
+    </HashRouter>
+  )
 }
 
-export default App;
+export default App
