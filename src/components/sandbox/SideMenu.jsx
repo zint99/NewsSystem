@@ -29,6 +29,7 @@ export default function SideMenu() {
     // 侧边栏选中和打开的菜单项
     const selectKeys = [location.pathname];
     const openkeys = ['/' + selectKeys[0].split('/')[1]];
+    const userInfo = JSON.parse(localStorage.getItem('token')) //当前登录的用户信息
 
     useEffect(() => {
         try {
@@ -44,7 +45,8 @@ export default function SideMenu() {
     }, [])
 
     const checkPagePermisson = (item) => {
-        return item.pagepermisson === 1
+        //必须同时满足次权限为pagepermisson和是当前登录用户所拥有的权限
+        return item.pagepermisson === 1 && userInfo.role.rights.includes(item.key)
     }
 
     const renderMenu = (menu) => {

@@ -1,0 +1,25 @@
+.background {
+    background-color: rgb(35, 39, 65);
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.form-box {
+    background-color: rgba(60, 117, 125, 0.6);
+    width: 500px;
+    height: 300px;
+    padding: 20px;
+    box-shadow: 15px 15px 25px rgba(0, 0, 0, 0.3);
+    /* border: 5px solid black; */
+    border-radius: 28px;
+}
+
+.title {
+    text-align: center;
+    font-size: 30px;
+    height: 80px;
+    line-height: 80px;
+    color: skyblue;
+}
