@@ -3,14 +3,15 @@ import { Form, Select, Input } from 'antd'
 import { forwardRef } from 'react/cjs/react.production.min';
 const { Option } = Select;
 
-
+//forwardRef接收父组件传入的ref容器
 const UserForm = forwardRef((props, ref) => {
+    //这个isDisabled状态变量用于控制角色为超级管理员时，区域的禁用状态
     const [isDisabled, setisDisabled] = useState(false)
 
-    const handleSelect = (item) => {
-        // console.log(ref.current)
-        //选中角色roleId为1时，设置区域select的disabled为true,name为1
-        if (item == 1) {
+    //此函数的作用是，若选中角色roleId为1(超级管理员)，setisDisabled(true)并清空region字段
+    const handleSelect = (value) => {
+        //这个value是字符串
+        if (+value === 1) {
             setisDisabled(true)
             ref.current.setFieldsValue({
                 region: ''
@@ -19,6 +20,7 @@ const UserForm = forwardRef((props, ref) => {
             setisDisabled(false)
         }
     }
+
     return (
         <Form
             layout="vertical"
@@ -53,7 +55,7 @@ const UserForm = forwardRef((props, ref) => {
                 label="区域"
                 rules={[
                     {
-                        required: !isDisabled,
+                        required: !isDisabled,  //若此项禁用则设置为非必填项
                     },
                 ]}
             >

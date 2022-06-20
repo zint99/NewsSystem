@@ -1,5 +1,7 @@
 @import '~antd/dist/antd.css';
 
+
+/* 设置侧边栏滚动条样式 */
 ::-webkit-scrollbar {
     width: 5px;
     height: 5px;

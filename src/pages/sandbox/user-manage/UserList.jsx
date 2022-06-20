@@ -9,7 +9,7 @@ export default function UserList() {
     const [isAddVisible, setIsAddVisible] = useState(false)
     const [regionList, setRegionList] = useState([])
     const [roleList, setRoleList] = useState([])
-    const addRef = useRef(null) //表单UserForm的引用
+    const addRef = useRef(null) //表单UserForm的ref容器
 
     useEffect(() => {
         axios.get(`http://localhost:5000/users?_expand=role`).then((res) => {
@@ -52,43 +52,77 @@ export default function UserList() {
             render: (item) => (
                 <div>
                     <Button type='primary' shape='circle' icon={<EditOutlined />} disabled={item.default}></Button>
-                    <Button shape='circle' icon={<DeleteOutlined />} danger disabled={item.default}></Button>
+                    <Button shape='circle' icon={<DeleteOutlined />} danger disabled={item.default} onClick={() => { deleteUserHander(item) }}></Button>
                 </div>
             )
         }
     ]
-
-
-
+    //删除用户按钮
+    const deleteUserHander = (user) => {
+        try {
+            Modal.confirm({
+                title: '你确定删除吗?',
+                icon: <ExclamationCircleOutlined />,
+                async onOk() {
+                    await fetch(`http://localhost:5000/users/${user.id}`, {
+                        method: 'DELETE'
+                    })
+                    const response = await fetch(`http://localhost:5000/users?_expand=role`)
+                    const data = await response.json()
+                    setUserList(data)
+                },
+                onCancel() {
+                    return
+                },
+            })
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    // 表单组件validateFields校验成功后向users post新用户
+    const clickOkHandler = async () => {
+        try {
+            const value = await addRef.current.validateFields()
+            await fetch(`http://localhost:5000/users`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    ...value,
+                    "roleState": true,
+                    "default": false,
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            const response = await fetch(`http://localhost:5000/users?_expand=role`)
+            const data = await response.json()
+            setUserList(data)
+            setIsAddVisible(false)
+        } catch (error) {
+            console.log(error)
+        }
+    }
     return (
         <div>
             <Button type='primary' onClick={() => setIsAddVisible(true)}>添加用户</Button>
-            <Table dataSource={userList} columns={columns}
+            <Table dataSource={userList}
+                columns={columns}
                 rowKey={item => item.id}
                 pagination={{
                     pageSize: 5
                 }}
             >
             </Table>
-
             <Modal
                 visible={isAddVisible}
                 title="添加用户"
                 okText="确定"
                 cancelText="取消"
                 onCancel={() => setIsAddVisible(false)}
-                onOk={() => {
-                    // console.log('add', addRef.current)
-                    addRef.current.validateFields().then((res) => {
-                        console.log(res)
-                    }).catch((err) => {
-                        console.log(err)
-                    })
-                }}
+                onOk={() => clickOkHandler()}
             >
                 <UserForm roleList={roleList} regionList={regionList} ref={addRef}></UserForm>
             </Modal>
-
         </div>
     )
 }

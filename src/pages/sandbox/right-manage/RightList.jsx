@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
 import { Table, Tag, Button, Modal, Popover, Switch } from 'antd'
 import { DeleteOutlined, EditOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 
@@ -10,21 +9,21 @@ export default function RightList() {
     const { confirm } = Modal
 
     useEffect(() => {
-        axios('http://localhost:5000/rights?_embed=children').then((res) => {
-            console.log('获取data并setData' + res.data)
-            const list = res.data;
-            list.forEach((item) => {
-                if (item.children.length === 0) {
-                    list[0].children = '';
-                }
-            })
-            setData(list)
-        })
+        getData('http://localhost:5000/rights?_embed=children')
     }, [])
 
-    /*
-        key可选
-    */
+    const getData = async (url = 'http://localhost:5000/rights?_embed=children') => {
+        const response = await fetch(url)
+        const data = await response.json()
+        data.forEach((item) => {
+            if (item.children.length === 0) {
+                item.children = '';
+            }
+        })
+        setData(data)
+    }
+
+    //配置Table列columns,key可选
     const columns = [
         {
             title: 'ID',
@@ -45,13 +44,20 @@ export default function RightList() {
         },
         {
             title: '操作',
+            // 没有写dataIndex，render的参数就是这一项
             render: (item) => (
                 <div>
-                    <Popover content={<div style={{ "textAlign": 'center' }}><Switch checked={item.pagepermisson} onChange={() => switchMethod(item)}></Switch></div>} title="页面配置项" trigger={item.pagepermisson === undefined ? '' : 'click'} >
+                    {/* 
+                    只有页面路由权限才能修改权限，功能权限禁用修改按钮，并设置无法点开popover
+                    pagepermisson字段控制权限
+                    */}
+                    <Popover
+                        content={<div style={{ "textAlign": 'center' }}><Switch checked={item.pagepermisson} onChange={() => switchRightHandler(item)}></Switch></div>}
+                        title="页面配置项"
+                        trigger={item.pagepermisson === undefined ? '' : 'click'} >
                         <Button type='primary' shape='circle' icon={<EditOutlined />} disabled={item.pagepermisson === undefined}></Button>
                     </Popover>
                     <Button shape='circle' icon={<DeleteOutlined />} danger onClick={() => showConfirm(item)}></Button>
-
                 </div>
             )
         },
@@ -62,28 +68,7 @@ export default function RightList() {
             title: '你确定删除吗?',
             icon: <ExclamationCircleOutlined />,
             onOk() {
-                console.log(item)
-                if (item.grade === 1) {
-                    setData(data.filter(data => data.id !== item.id))
-                    axios.delete(`http://localhost:5000/rights/${item.id}`)
-                } else {
-                    //item为二级权限，通过item.rightId找到data中对应的一级权限，再操作一级权限中对应item.id的children
-                    //深复制Data
-                    //找到对应的一级权限项
-                    //操作其children，得到新的Data。
-                    //setData
-                    const newData = JSON.parse(JSON.stringify(data));
-                    newData.forEach((newDataItem) => {
-                        if (newDataItem.id === item.rightId) {
-                            newDataItem.children = newDataItem.children.filter((child) => {
-                                return child.id !== item.id
-                            })
-                        }
-                    })
-                    setData(newData)
-                    //向后端children接口发送delete请求
-                    axios.delete(`http://localhost:5000/children/${item.id}`)
-                }
+                deleteRightHandler(item)
             },
             onCancel() {
                 return
@@ -91,32 +76,56 @@ export default function RightList() {
         })
     }
 
-    const switchMethod = item => {
-        //修改前端状态
-        item.pagepermisson = item.pagepermisson === 1 ? 0 : 1
-        setData([...data])
-        //根据grade调后端接口
+    //删除权限
+    const deleteRightHandler = async (item) => {
         if (item.grade === 1) {
-            axios.patch(`http://localhost:5000/rights/${item.id}`, {
-                pagepermisson: item.pagepermisson
+            //一级权限
+            await fetch(`http://localhost:5000/rights/${item.id}`, {
+                method: 'DELETE'
             })
+            getData()
         } else {
-            axios.patch(`http://localhost:5000/children/${item.id}`, {
-                pagepermisson: item.pagepermisson
+            //二级权限在children删
+            await fetch(`http://localhost:5000/children/${item.id}`, {
+                method: 'DELETE'
             })
+            getData()
         }
     }
 
+    const switchRightHandler = async item => {
+        //如果patch后再取数据更新状态，switch按钮会有明显的抖动
+        item.pagepermisson = item.pagepermisson === 1 ? 0 : 1
+        //深复制
+        const newData = JSON.parse(JSON.stringify(data))
+        setData(newData)
+        if (item.grade === 1) {
+            await fetch(`http://localhost:5000/rights/${item.id}`, {
+                method: 'PATCH',
+                body: JSON.stringify({
+                    pagepermisson: item.pagepermisson
+                }),
+                headers: {
+                    "Content-Type": 'application/json'
+                }
+            })
+        } else {
+            await fetch(`http://localhost:5000/children/${item.id}`, {
+                method: 'PATCH',
+                body: JSON.stringify({
+                    pagepermisson: item.pagepermisson
+                }),
+                headers: {
+                    "Content-Type": 'application/json'
+                }
+            })
+        }
+    }
     return (
         <div>
             权限列表
             <hr />
-            <Table columns={columns} dataSource={data} pagination={
-                {
-                    pageSize: 5
-                }
-            }
-            />
+            <Table columns={columns} dataSource={data} pagination={{ pageSize: 5 }} />
         </div>
     )
 }

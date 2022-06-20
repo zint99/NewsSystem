@@ -7,11 +7,11 @@ import { EditOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-de
 export default function RoleList() {
     const [dataSource, setDataSource] = useState([])    //角色数据
     const [rightList, setRightList] = useState([])  //权限列表
-    const [currentRights, setCurrentRights] = useState([])  //当前选中行的权限列表
+    const [currentRights, setCurrentRights] = useState([])  //保存当前选中角色的权限列表
     const [currentId, setCurrentId] = useState(0)   //当前选中行的ID
     const [isModalVisible, setIsModalVisible] = useState(false) //模态框状态
-
     const { confirm } = Modal
+
     useEffect(() => {
         axios.get(`http://localhost:5000/roles`).then((res) => {
             setDataSource(res.data)
@@ -22,6 +22,57 @@ export default function RoleList() {
             setRightList(res.data)
         })
     }, [])
+
+    const onCheck = (checkKeys) => {
+        //Tree中check权限
+        setCurrentRights(checkKeys.checked)
+    }
+
+    const handleOk = () => {
+        setIsModalVisible(false)
+        //通过currentId，修改dataSource中对应id的rights为currentRights
+        setDataSource(dataSource.map((item) => {
+            if (item.id === currentId) {
+                // 找到对应currentId的一项，修改其rights为currentRights
+                return {
+                    ...item,
+                    rights: currentRights
+                }
+            }
+            return item
+        }))
+
+        //patch 修改后端数据
+        axios.patch(`http://localhost:5000/roles/${currentId}`, {
+            rights: currentRights
+        })
+    }
+
+    const handleCancel = () => {
+        setIsModalVisible(false)
+    }
+
+    const showModal = (item) => {
+        //show modal and set roles currentRights and currentId
+        setIsModalVisible(!isModalVisible)
+        setCurrentRights(item.rights)
+        setCurrentId(item.id)
+    }
+
+    const showConfirm = (item) => {
+        confirm({
+            title: '你确定删除吗?',
+            icon: <ExclamationCircleOutlined />,
+            onOk() {
+                //先前后后
+                setDataSource(dataSource.filter(data => data.id !== item.id))
+                axios.delete(`http://localhost:5000/roles/${item.id}`)
+            },
+            onCancel() {
+                return
+            },
+        })
+    }
 
     //角色列表Table中的每一列
     const columns = [
@@ -50,64 +101,13 @@ export default function RoleList() {
                             onCheck={onCheck}
                             treeData={rightList}
                             checkedKeys={currentRights}
-                            checkStrictly
+                            checkStrictly //取消父子选中状态关联
                         />
                     </Modal>
                 </div>
             )
         }
     ]
-
-    const onCheck = (checkKeys) => {
-        setCurrentRights(checkKeys.checked)
-    }
-
-    const handleOk = () => {
-        setIsModalVisible(false)
-        //通过currentId，修改rightList中对应的rights为currentRights
-        // console.log(currentRights)
-        setDataSource(dataSource.map((item) => {
-            if (item.id === currentId) {
-                // 找到对应currentId的一项，修改其rights为currentRights
-                return {
-                    ...item,
-                    rights: currentRights
-                }
-            }
-            return item
-        }))
-
-        //patch 修改后端数据
-        axios.patch(`http://localhost:5000/roles/${currentId}`, {
-            rights: currentRights
-        })
-    }
-
-    const handleCancel = () => {
-        setIsModalVisible(false)
-    }
-
-    const showModal = (item) => {
-        //show modal and set currentRights and currentId
-        setIsModalVisible(!isModalVisible)
-        setCurrentRights(item.rights)
-        setCurrentId(item.id)
-    }
-
-    const showConfirm = (item) => {
-        confirm({
-            title: '你确定删除吗?',
-            icon: <ExclamationCircleOutlined />,
-            onOk() {
-                console.log(item)
-                setDataSource(dataSource.filter(data => data.id !== item.id))
-                axios.delete(`http://localhost:5000/roles/${item.id}`)
-            },
-            onCancel() {
-                return
-            },
-        })
-    }
 
     return (
         <Table dataSource={dataSource} columns={columns} rowKey={item => item.id}></Table>

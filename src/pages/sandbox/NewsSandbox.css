@@ -20,6 +20,7 @@
     background: #fff;
 }
 
+/* 控制layout布局和根组件高度为100%，而不是被内容撑开 */
 .ant-layout,
 #root {
     height: 100%;

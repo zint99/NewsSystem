@@ -18,6 +18,7 @@ export default function NewsSandbox() {
                         margin: '24px 16px',
                         padding: 24,
                         minHeight: 280,
+                        overflow: 'auto'
                     }}
                 >
                     {/* 这里放匹配的二级路由内容 */}

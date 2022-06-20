@@ -7,7 +7,7 @@ import RightList from '../pages/sandbox/right-manage/RightList'
 import RoleList from '../pages/sandbox/right-manage/RoleList'
 import NotFound from '../pages/notFound/NotFound'
 
-export default [
+const routes = [
     //一级路由为 / 和 /login
     {
         path: '/',
@@ -58,3 +58,5 @@ function AuthComponent({ children }) {
     const isLogin = localStorage.getItem('token');
     return isLogin ? children : <Navigate to='/login' />
 }
+
+export default routes

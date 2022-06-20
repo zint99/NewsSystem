@@ -19,13 +19,14 @@ export default function TopHeader() {
             <Menu.Item danger key='2'>退出</Menu.Item>
         </Menu>
     );
-    const toggle = () => {
+    //点击切换header折叠图标的处理函数
+    const toggleCollapsedHandler = () => {
         setCollapsed(!collapsed)
     }
     return (
         <Header className="site-layout-background" style={{ padding: '0 16px' }}>
             {
-                collapsed ? <MenuUnfoldOutlined className='trigger' onClick={toggle} /> : <MenuFoldOutlined className='trigger' onClick={toggle} />
+                collapsed ? <MenuUnfoldOutlined className='trigger' onClick={toggleCollapsedHandler} /> : <MenuFoldOutlined className='trigger' onClick={toggleCollapsedHandler} />
             }
             <div style={{ float: 'right' }}>
                 <span>欢迎admin回来</span>
