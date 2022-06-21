@@ -44,55 +44,58 @@ const routesMap = {
 export default function BaseRouter() {
     const [routes, setRoutes] = useState([])
 
-    useEffect(async () => {
-        const data = await Promise.all([(await fetch('http://localhost:5000/rights')).json(), (await fetch('http://localhost:5000/children')).json()])
-        let newsBackRoutes = [...data[0], ...data[1]]
-        //取得newsRoutes后和userInfo的权限对比，然后动态渲染出二级的routes
-        const userRoutes = newsBackRoutes.map((item) => {
-            //如果后台权限中设置的pagepermisson为1，且userinfo也有这个权限，则渲染
-            if (item.pagepermisson === 1 && userInfo.role.rights.includes(item.key)) {
-                return {
-                    path: item.key,
-                    element: routesMap[item.key]
+    useEffect(() => {
+        async function fetchData() {
+            const data = await Promise.all([(await fetch('http://localhost:5000/rights')).json(), (await fetch('http://localhost:5000/children')).json()])
+            let newsBackRoutes = [...data[0], ...data[1]]
+            //取得newsRoutes后和userInfo的权限对比，然后动态渲染出二级的routes
+            const userRoutes = newsBackRoutes.map((item) => {
+                //如果后台权限中设置的pagepermisson为1，且userinfo也有这个权限，则渲染
+                if (item.pagepermisson === 1 && userInfo.role.rights.includes(item.key)) {
+                    return {
+                        path: item.key,
+                        element: routesMap[item.key]
+                    }
+                } else {
+                    return null
                 }
-            } else {
-                return null
-            }
-        })
-        const userRoutesHandled = userRoutes.filter((route) => {
-            return route !== null && route.element !== undefined
-        })
-        const routes = [
-            {
-                path: '/',
-                element: <AuthComponent>
-                    <NewsSandbox></NewsSandbox>
-                </AuthComponent>,
-                children:
-                    [
-                        {
-                            //重定向到/home
-                            path: '/',
-                            element: <Navigate to='/home' />
-                        },
-                        ...userRoutesHandled,
-                        {
-                            path: '*',
-                            element: <NoPermisson />
-                        },
-                    ]
-            },
-            {
-                path: '/login',
-                element: <Login />
-            },
-            {
-                //如果上面路径都没匹配到，则匹配 <NotFound />这个组件
-                path: '*',
-                element: <NoPermisson />
-            },
-        ]
-        setRoutes(routes)
+            })
+            const userRoutesHandled = userRoutes.filter((route) => {
+                return route !== null && route.element !== undefined
+            })
+            const routes = [
+                {
+                    path: '/',
+                    element: <AuthComponent>
+                        <NewsSandbox></NewsSandbox>
+                    </AuthComponent>,
+                    children:
+                        [
+                            {
+                                //重定向到/home
+                                path: '/',
+                                element: <Navigate to='/home' />
+                            },
+                            ...userRoutesHandled,
+                            {
+                                path: '*',
+                                element: <NoPermisson />
+                            },
+                        ]
+                },
+                {
+                    path: '/login',
+                    element: <Login />
+                },
+                {
+                    //如果上面路径都没匹配到，则匹配 <NotFound />这个组件
+                    path: '*',
+                    element: <NoPermisson />
+                },
+            ]
+            setRoutes(routes)
+        }
+        fetchData()
     }, [])
 
     const element = useRoutes(routes);
