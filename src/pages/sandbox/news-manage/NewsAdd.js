@@ -34,7 +34,6 @@ export default function NewsAdd() {
         if (newsEditorText === '') {
           message.error('新闻内容不能为空')
         } else {
-          console.log(newsInfos, newsEditorContent)
           setCurrent(current + 1);
         }
       }
@@ -106,8 +105,6 @@ export default function NewsAdd() {
 
   // http://localhost:5000/news 提交新闻数据
   const saveHandler = async (auditState) => {
-    console.log(newsInfos, newsEditorContent)
-
     try {
       //先post数据
       await fetch('http://localhost:5000/news', {

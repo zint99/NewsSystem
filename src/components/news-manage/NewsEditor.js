@@ -19,6 +19,15 @@ export default function NewsEditor(props) {
             setEditor(null)
         }
     }, [editor])
+
+    //设置未更新前路由跳转过来的原来的html内容
+    useEffect(() => {
+        const handleDefault = async () => {
+            await setHtml(props.defaultNewsContent)
+            props.getNewsEditorContent(html, '未修改内容则默认不为空')
+        }
+        handleDefault()
+    }, [props.defaultNewsContent])
     return (
         <>
             <div style={{ border: '1px solid #ccc', zIndex: 100 }} onBlur={() => {
@@ -37,7 +46,6 @@ export default function NewsEditor(props) {
                     onChange={editor => setHtml(editor.getHtml())}
                     mode="default"
                     style={{ height: '300px', overflowY: 'auto' }}
-
                 />
             </div>
         </>

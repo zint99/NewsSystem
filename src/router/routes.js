@@ -9,6 +9,7 @@ import NoPermisson from '../pages/noPermisson/NoPermisson'
 import NewsAdd from '../pages/sandbox/news-manage/NewsAdd'
 import NewsDraft from '../pages/sandbox/news-manage/NewsDraft'
 import NewsCategory from '../pages/sandbox/news-manage/NewsCategory'
+import NewsPreview from '../pages/sandbox/news-manage/NewsPreview'
 import Audit from '../pages/sandbox/audit-manage/Audit'
 import AuditList from '../pages/sandbox/audit-manage/AuditList'
 import Published from '../pages/sandbox/publish-manage/Published'
@@ -30,6 +31,7 @@ const routesMap = {
     "/news-manage/add": <NewsAdd />,
     "/news-manage/draft": <NewsDraft />,
     "/news-manage/category": <NewsCategory />,
+    "/news-manage/preview/:id": <NewsPreview />,
     "/audit-manage/audit": <Audit />,
     "/audit-manage/list": <AuditList />,
     "/publish-manage/unpublished": <Unpublished />,
@@ -43,7 +45,7 @@ const renderRoutes = async () => {
     //取得newsRoutes后和userInfo的权限对比，然后动态渲染出二级的routes
     const userRoutes = newsBackRoutes.map((item) => {
         //如果后台权限中设置的pagepermisson为1，且userinfo也有这个权限，则渲染
-        if (item.pagepermisson === 1 && userInfo.role.rights.includes(item.key)) {
+        if ((item.pagepermisson === 1 || item.routepermisson === 1) && userInfo.role.rights.includes(item.key)) {
             return {
                 path: item.key,
                 element: routesMap[item.key]

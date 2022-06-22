@@ -12,6 +12,7 @@ export default function RightList() {
         getData('http://localhost:5000/rights?_embed=children')
     }, [])
 
+    //从接口'http://localhost:5000/rights?_embed=children'获取最新权限数据，并设置为状态
     const getData = async (url = 'http://localhost:5000/rights?_embed=children') => {
         const response = await fetch(url)
         const data = await response.json()
@@ -22,7 +23,6 @@ export default function RightList() {
         })
         setData(data)
     }
-
     //配置Table列columns,key可选
     const columns = [
         {
