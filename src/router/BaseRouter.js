@@ -55,7 +55,7 @@ export default function BaseRouter() {
             //取得newsRoutes后和userInfo的权限对比，然后动态渲染出二级的routes
             const userRoutes = newsBackRoutes.map((item) => {
                 //如果后台权限中设置的pagepermisson为1，且userinfo也有这个权限，则渲染
-                if ((item.pagepermisson === 1 || item.routepermisson === 1) && userInfo.role.rights.includes(item.key)) {
+                if ((item.pagepermisson === 1 || item.routepermisson === 1) && userInfo?.role.rights.includes(item.key)) {
                     return {
                         path: item.key,
                         element: routesMap[item.key]
@@ -64,6 +64,7 @@ export default function BaseRouter() {
                     return null
                 }
             })
+            //处理后的路由
             const userRoutesHandled = userRoutes.filter((route) => {
                 return route !== null && route.element !== undefined
             })

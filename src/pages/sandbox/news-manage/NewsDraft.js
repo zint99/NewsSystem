@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Table, Button, Modal, Tag, message } from 'antd'
+import { Table, Button, Modal, Tag, message, notification } from 'antd'
 import { EditOutlined, DeleteOutlined, ExclamationCircleOutlined, UploadOutlined } from '@ant-design/icons'
 
 export default function NewsDraft() {
   const [draftNewsData, setDraftNewsData] = useState([])
   const userInfo = JSON.parse(localStorage.getItem('token'))
   const navigate = useNavigate()
-  //取对应用户名且auditState=0的数据
+  //取对应角色且auditState=0的数据
   const fetchData = async () => {
-    const data = await (await fetch(`http://localhost:5000/news?${userInfo.username}=admin&auditState=0&_expand=category`)).json()
+    const url = userInfo.roleId === 1 ? `http://localhost:5000/news?auditState=0&_expand=category` :
+      userInfo.roleId === 2 ? `http://localhost:5000/news?region=${userInfo.region}&auditState=0&_expand=category` :
+        `http://localhost:5000/news?author=${userInfo.username}&auditState=0&_expand=category`
+    const data = await (await fetch(url)).json()
     setDraftNewsData(data)
   }
   useEffect(() => {
@@ -46,7 +49,7 @@ export default function NewsDraft() {
           {/* 更新按钮携带state参数(当前新闻信息进行路由跳转) */}
           <Button type="ghost" shape='circle' icon={<EditOutlined />} onClick={() => { navigate(`/news-manage/update/${item.id}`, { state: { ...item } }) }}></Button>
           <Button shape='circle' icon={<DeleteOutlined />} danger onClick={() => showConfirm(item)}></Button>
-          <Button type="primary" shape='circle' icon={<UploadOutlined />}></Button>
+          <Button type="primary" shape='circle' icon={<UploadOutlined />} onClick={() => { checkNewsHandler(item) }}></Button>
         </>
       )
     },
@@ -76,9 +79,34 @@ export default function NewsDraft() {
     }
   }
 
+  const checkNewsHandler = async (news) => {
+    // console.log(news)
+    try {
+      await fetch(`http://localhost:5000/news/${news.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          auditState: 1
+        }),
+        headers: {
+          "Content-Type": 'application/json'
+        }
+      })
+      //提交审核成功后路由根据不同的auditState进行路由跳转
+      navigate('/audit-manage/list')
+      //然后右下角通知提醒框
+      notification.info({
+        message: `通知`,
+        description: `请前往审核列表查看您的新闻信息`,
+        placement: 'bottomRight'
+      })
+    } catch (error) {
+      message.error("提交审核失败！")
+    }
+  }
+
   return (
-    <div style={{ textAlign: 'center' }}>
+    <>
       <Table columns={columns} dataSource={draftNewsData} pagination={{ pageSize: 5 }} rowKey={(item) => item.id} />
-    </div>
+    </>
   )
 }

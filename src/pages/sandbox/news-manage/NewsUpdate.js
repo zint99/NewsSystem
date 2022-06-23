@@ -86,7 +86,6 @@ export default function NewsUpdate() {
                     ...updateNewsInfos,
                     content: newsEditorContent,
                     auditState,
-                    createTime: Date.now(),
                 }),
                 headers: {
                     'Content-Type': 'application/json'

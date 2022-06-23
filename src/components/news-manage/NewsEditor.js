@@ -20,7 +20,7 @@ export default function NewsEditor(props) {
         }
     }, [editor])
 
-    //设置未更新前路由跳转过来的原来的html内容
+    //设置路由跳转过来的原来的未更新前html内容
     useEffect(() => {
         const handleDefault = async () => {
             await setHtml(props.defaultNewsContent)
