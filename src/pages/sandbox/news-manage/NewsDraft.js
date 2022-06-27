@@ -55,7 +55,7 @@ export default function NewsDraft() {
     },
   ]
 
-  // 删除新闻
+  // 弹出删除新闻的confirm
   const showConfirm = (item) => {
     Modal.confirm({
       title: '你确定删除吗?',
@@ -80,7 +80,6 @@ export default function NewsDraft() {
   }
 
   const checkNewsHandler = async (news) => {
-    // console.log(news)
     try {
       await fetch(`http://localhost:5000/news/${news.id}`, {
         method: 'PATCH',
