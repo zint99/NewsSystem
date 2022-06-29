@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Layout, Menu } from "antd";
-import { SmileOutlined, UserOutlined, RightOutlined } from "@ant-design/icons";
+import { SmileOutlined, UserOutlined } from "@ant-design/icons";
 import "./SideMenu.css";
 
 const { Sider } = Layout;
@@ -13,7 +13,7 @@ const iconList = {
   "/user-manage": <UserOutlined />,
   "/user-manage/list": <UserOutlined />,
   "/role-manage": <UserOutlined />,
-  "/right-manage": <RightOutlined />,
+  "/right-manage": <UserOutlined />,
   "/right-manage/role/list": <UserOutlined />,
   "/right-manage/right/list": <UserOutlined />,
 };

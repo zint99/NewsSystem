@@ -11,6 +11,7 @@
     "@wangeditor/editor-for-react": "^1.0.4",
     "antd": "^4.21.3",
     "axios": "^0.26.1",
+    "fetch-intercept": "^2.4.0",
     "http-proxy-middleware": "^2.0.4",
     "nprogress": "^0.2.0",
     "react": "^17.0.1",
