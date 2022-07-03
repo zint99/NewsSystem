@@ -9,6 +9,5 @@ const store = configureStore({
     loading: loadingReducer,
   },
 });
-
 const persistor = persistStore(store);
 export { store, persistor };
