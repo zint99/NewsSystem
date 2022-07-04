@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 // import routes from './routes'
 import { Navigate } from "react-router-dom";
 import Login from "../pages/login/Login";
+import News from "../pages/news/News";
+import Detail from "../pages/news/Detail";
 import NewsSandbox from "../pages/sandbox/NewsSandbox";
 import Home from "../pages/sandbox/home/Home";
 import UserList from "../pages/sandbox/user-manage/UserList";
@@ -98,6 +100,14 @@ export default function BaseRouter() {
         {
           path: "/login",
           element: <Login />,
+        },
+        {
+          path: "/news",
+          element: <News />,
+        },
+        {
+          path: "/detail",
+          element: <Detail />,
         },
         {
           //如果上面路径都没匹配到，则匹配 <NotFound />这个组件

@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 export default function NewsEditor(props) {
   const [editor, setEditor] = useState(null); // 存储 editor 实例
   const [html, setHtml] = useState(""); // 编辑器内容
-
+  console.log(props);
   const toolbarConfig = {};
   const editorConfig = {
     placeholder: "请输入内容...",
@@ -20,13 +20,14 @@ export default function NewsEditor(props) {
   }, [editor]);
 
   //设置路由跳转过来的原来的未更新前html内容
+  const handleDefault = async () => {
+    setHtml(props.defaultNewsContent);
+    props.getNewsEditorContent(html, "未修改内容则默认不为空");
+  };
   useEffect(() => {
-    const handleDefault = async () => {
-      await setHtml(props.defaultNewsContent);
-      props.getNewsEditorContent(html, "未修改内容则默认不为空");
-    };
-    handleDefault();
-  }, [props.defaultNewsContent, props, html]);
+    //如果是修改则执行这个handleDefault
+    props.defaultNewsContent && handleDefault();
+  }, [props.defaultNewsContent, handleDefault]);
   return (
     <>
       <div
@@ -45,9 +46,11 @@ export default function NewsEditor(props) {
           defaultConfig={editorConfig}
           value={html}
           onCreated={setEditor}
-          onChange={(editor) => setHtml(editor.getHtml())}
+          onChange={(editor) => {
+            setHtml(editor.getHtml());
+          }}
           mode="default"
-          style={{ height: "300px", overflowY: "auto" }}
+          style={{ height: "320px", overflowY: "auto" }}
         />
       </div>
     </>

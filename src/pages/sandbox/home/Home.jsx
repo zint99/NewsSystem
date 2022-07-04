@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Card, Col, Row, List, Avatar } from "antd";
+import { Card, Col, Row, List, Avatar, Drawer } from "antd";
 import { Link } from "react-router-dom";
 import * as echarts from "echarts";
 import _ from "lodash";
@@ -15,9 +15,12 @@ const { Meta } = Card;
 export default function Home() {
   const [viewList, setViewList] = useState([]);
   const [likeList, setLikeList] = useState([]);
+  const [visible, setVisible] = useState(false); //控制Drawer
+  const [pieChart, setPieChart] = useState(null);
+  const [groupedNewsList, setGroupedNewsList] = useState([]);
   const userInfo = JSON.parse(localStorage.getItem("token"));
   const barRef = useRef(null);
-
+  const pieRef = useRef(null);
   useEffect(() => {
     fetch(
       "http://localhost:5000/news?_expand=category&publishState=2&_sort=view&_order=desc&_limit=6"
@@ -43,7 +46,7 @@ export default function Home() {
     // 绘制图表
     myChart.setOption({
       title: {
-        text: "新闻分类柱状图",
+        text: "全系统新闻分类柱状图",
       },
       tooltip: {},
       legend: {
@@ -75,12 +78,72 @@ export default function Home() {
       .then((res) => res.json())
       .then((data) => {
         const groupData = _.groupBy(data, (data) => data.category.title);
+        setGroupedNewsList(groupData);
         renderBar(groupData);
       });
     return () => {
       window.onresize = null;
     };
   }, []);
+
+  const onClose = () => {
+    setVisible(false);
+  };
+  const renderPie = (data) => {
+    // console.log(Object.entries(data));
+    const pieData = Object.entries(data)
+      .map((item) => {
+        return {
+          name: item[0],
+          value: item[1].filter((news) => news.author === userInfo.username)
+            .length,
+        };
+      })
+      .filter((item) => item.value !== 0);
+    // console.log(pieData);
+    // 用状态来保存piechart容器，避免多次初始化
+    let myChart;
+    if (!pieChart) {
+      myChart = echarts.init(pieRef.current);
+      setPieChart(myChart);
+    } else {
+      myChart = pieChart;
+    }
+    const option = {
+      title: {
+        text: "当前用户新闻分类图示",
+        subtext: "饼状图",
+        left: "center",
+      },
+      tooltip: {
+        trigger: "item",
+      },
+      legend: {
+        orient: "vertical",
+        left: "left",
+      },
+      series: [
+        {
+          name: "发布新闻分类",
+          type: "pie",
+          radius: "50%",
+          data: pieData,
+          emphasis: {
+            itemStyle: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: "rgba(0, 0, 0, 0.5)",
+            },
+          },
+        },
+      ],
+    };
+    option && myChart.setOption(option);
+  };
+  const showPieChart = async () => {
+    await setVisible(true);
+    renderPie(groupedNewsList);
+  };
 
   return (
     <>
@@ -129,7 +192,12 @@ export default function Home() {
                 />
               }
               actions={[
-                <PieChartOutlined key="setting" />,
+                <PieChartOutlined
+                  key="setting"
+                  onClick={() => {
+                    showPieChart();
+                  }}
+                />,
                 <EditOutlined key="edit" />,
                 <EllipsisOutlined key="ellipsis" />,
               ]}
@@ -155,9 +223,25 @@ export default function Home() {
         style={{
           width: "100%",
           height: "400px",
-          marginTop: "30px",
+          // marginTop: "10px",
         }}
       ></div>
+      <Drawer
+        width="600px"
+        title="个人新闻分类"
+        placement="right"
+        onClose={onClose}
+        visible={visible}
+      >
+        <div
+          ref={pieRef}
+          style={{
+            width: "100%",
+            height: "400px",
+            marginTop: "30px",
+          }}
+        ></div>
+      </Drawer>
     </>
   );
 }
