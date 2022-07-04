@@ -106,7 +106,7 @@ export default function BaseRouter() {
           element: <News />,
         },
         {
-          path: "/detail",
+          path: "/detail/:id",
           element: <Detail />,
         },
         {

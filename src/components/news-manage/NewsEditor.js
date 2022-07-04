@@ -1,6 +1,6 @@
 import { Editor, Toolbar } from "@wangeditor/editor-for-react";
 import "@wangeditor/editor/dist/css/style.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 export default function NewsEditor(props) {
   const [editor, setEditor] = useState(null); // 存储 editor 实例
@@ -20,10 +20,10 @@ export default function NewsEditor(props) {
   }, [editor]);
 
   //设置路由跳转过来的原来的未更新前html内容
-  const handleDefault = async () => {
+  const handleDefault = useCallback(async () => {
     setHtml(props.defaultNewsContent);
     props.getNewsEditorContent(html, "未修改内容则默认不为空");
-  };
+  }, [html, props]);
   useEffect(() => {
     //如果是修改则执行这个handleDefault
     props.defaultNewsContent && handleDefault();

@@ -1,5 +1,6 @@
 import React from "react";
+import NewsPreview from "../sandbox/news-manage/NewsPreview";
 
 export default function Detail() {
-  return <div>Detail</div>;
+  return <NewsPreview isCustomer={true} />;
 }

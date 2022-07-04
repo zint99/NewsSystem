@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { PageHeader, Card, Col, Row, List } from "antd";
+import { Link } from "react-router-dom";
 
 export default function News() {
-  const [newsList, setNewsList] = useState([]);
-  const [categoriesList, setCategoriesList] = useState([]);
-  const [colData, setColData] = useState([]);
+  const [colList, setColList] = useState(null);
 
   const fetchData = async () => {
     const data = await Promise.all([
@@ -23,11 +22,36 @@ export default function News() {
         news: newsList.filter((news) => news.category.title === category.title),
       };
     });
-    // console.log(colData)
-    setNewsList(newsList);
-    setCategoriesList(categories);
-
-    setColData(colData);
+    console.log(colData);
+    setColList(
+      colData.map((col) => {
+        return (
+          <Col span={8} key={col.title}>
+            <Card title={col.title} bordered hoverable>
+              <List
+                size="small"
+                pagination={{
+                  pageSize: 3,
+                }}
+                dataSource={col.news}
+                renderItem={(item) => {
+                  // console.log(item);
+                  return (
+                    <List.Item>
+                      {
+                        <Link to={`/detail/${item.id}`} state={{ ...item }}>
+                          {item.title}
+                        </Link>
+                      }
+                    </List.Item>
+                  );
+                }} //路由链接跳转到详情页
+              />
+            </Card>
+          </Col>
+        );
+      })
+    );
   };
   useEffect(() => {
     fetchData();
@@ -46,36 +70,7 @@ export default function News() {
         subTitle="查看新闻"
       />
       <div className="site-card-wrapper">
-        <Row gutter={[16, 16]}>
-          {/* <Col span={8}>
-            <Card title="Card title" bordered hoverable>
-              <List
-                size="small"
-                pagination={{
-                  pageSize: 3,
-                }}
-                dataSource={["11", "22"]}
-                renderItem={(item) => <List.Item>{item}</List.Item>}
-              />
-            </Card>
-          </Col> */}
-          {colData.map((col) => {
-            return (
-              <Col span={8}>
-                <Card title={col.title} bordered hoverable>
-                  <List
-                    size="small"
-                    pagination={{
-                      pageSize: 3,
-                    }}
-                    dataSource={col.news}
-                    renderItem={(item) => <List.Item>{item}</List.Item>}
-                  />
-                </Card>
-              </Col>
-            );
-          })}
-        </Row>
+        <Row gutter={[16, 16]}>{colList}</Row>
       </div>
     </div>
   );
