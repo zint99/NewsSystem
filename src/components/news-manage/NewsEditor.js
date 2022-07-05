@@ -5,7 +5,6 @@ import { useState, useEffect, useCallback } from "react";
 export default function NewsEditor(props) {
   const [editor, setEditor] = useState(null); // 存储 editor 实例
   const [html, setHtml] = useState(""); // 编辑器内容
-  console.log(props);
   const toolbarConfig = {};
   const editorConfig = {
     placeholder: "请输入内容...",

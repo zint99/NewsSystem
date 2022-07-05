@@ -11,3 +11,11 @@
   height: 500px;
   overflow: auto;
 }
+
+.HeartTwoTone {
+  transition: 1s;
+}
+
+.HeartTwoTone:hover {
+  transform: rotate(1turn);
+}

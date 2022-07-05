@@ -22,7 +22,7 @@ export default function News() {
         news: newsList.filter((news) => news.category.title === category.title),
       };
     });
-    console.log(colData);
+    // console.log(colData);
     setColList(
       colData.map((col) => {
         return (

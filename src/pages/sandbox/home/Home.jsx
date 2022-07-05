@@ -150,7 +150,19 @@ export default function Home() {
       <div className="site-card-wrapper">
         <Row gutter={16}>
           <Col span={8}>
-            <Card title="用户最常浏览" bordered={true}>
+            <Card
+              title={
+                <>
+                  {"用户最常浏览"}
+                  {
+                    <span style={{ marginLeft: "5px" }}>
+                      <BarChartOutlined />
+                    </span>
+                  }
+                </>
+              }
+              bordered={true}
+            >
               <List
                 dataSource={viewList}
                 renderItem={(item) => (
@@ -167,7 +179,19 @@ export default function Home() {
             </Card>
           </Col>
           <Col span={8}>
-            <Card title="用户点赞最多" bordered={true}>
+            <Card
+              title={
+                <>
+                  {"用户点赞最多"}
+                  {
+                    <span style={{ marginLeft: "5px" }}>
+                      <BarChartOutlined />
+                    </span>
+                  }
+                </>
+              }
+              bordered={true}
+            >
               <List
                 dataSource={likeList}
                 renderItem={(item) => (
